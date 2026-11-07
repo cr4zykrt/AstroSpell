@@ -2,7 +2,7 @@
 
 Voice-controlled spelling game. The server serves the game, **generates a new set of levels on every visit**, and logs sessions to MongoDB.
 
-![AstroSpell gameplay: Level 1, spell the word WARP](docs/gameplay.png)
+![AstroSpell gameplay: Level 1, spell the word WARP](docs/game.png)
 
 *Level 1: the player destroys each letter by saying it with the phonetic alphabet (Whiskey, Alpha, Romeo, Papa spells WARP).*
 ## Run it
