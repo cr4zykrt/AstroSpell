@@ -1,0 +1,447 @@
+#gameplay-screen{
+    position: relative;
+    overflow: hidden;
+    width: 100vw;
+    min-height: 100vh;
+    height: 100vh;
+    background: #040814;
+}
+
+#gameplay-video{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    min-width: 100%;
+    min-height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    z-index: 0;
+    pointer-events: none;
+}
+
+#gameplay-screen::before{
+
+    content:"";
+    position:absolute;
+    inset:0;
+    z-index:1;
+    background:radial-gradient(circle at center top, rgba(83, 178, 255, 0.18), transparent 25%),
+                linear-gradient(180deg, rgba(1, 6, 20, 0.24), rgba(0, 0, 0, 0.72));
+    pointer-events:none;
+
+}
+
+#hud{
+
+    position:absolute;
+
+    inset:0;
+
+    z-index:2;
+
+    pointer-events:none;
+
+}
+
+.hud-panel{
+
+    position:absolute;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    padding:14px 20px;
+
+    min-width:170px;
+
+    border:1px solid rgba(255,255,255,0.16);
+
+    border-radius:30px;
+
+    background:rgba(6, 14, 32, 0.72);
+
+    box-shadow:0 18px 60px rgba(4, 18, 58, 0.28);
+
+    pointer-events:auto;
+
+}
+
+.level-panel{
+
+    top:20px;
+
+    left:30px;
+
+    min-width:190px;
+
+    padding:14px 22px;
+
+    border-radius:32px;
+
+    background:rgba(8, 20, 48, 0.86);
+
+    border:1px solid rgba(114, 175, 255, 0.18);
+
+}
+
+.level-panel .hud-value{
+
+    font-size:20px;
+
+}
+
+.score-panel{
+
+    top:20px;
+
+    right:30px;
+
+}
+
+.lives-panel{
+
+    bottom:30px;
+
+    left:30px;
+
+    min-width:190px;
+
+}
+
+.hud-title{
+
+    font-size:12px;
+
+    letter-spacing:1.8px;
+
+    text-transform:uppercase;
+
+    color:#8fbfff;
+
+    margin-bottom:8px;
+
+}
+
+.hud-value{
+
+    font-size:24px;
+
+    font-weight:700;
+
+    color:#f5f9ff;
+
+}
+
+.heart-icon{
+    width:32px;
+    height:32px;
+    object-fit:contain;
+    margin: 0 4px;
+    vertical-align:middle;
+}
+
+#game-area{
+    width:100%;
+    flex:1;
+    position:relative;
+    display:flex;
+    justify-content:center;
+    align-items:flex-end;
+    padding-bottom:120px;
+    min-height: calc(100vh - 220px);
+    overflow:hidden;
+}
+
+#player{
+
+    position:absolute;
+
+    bottom:60px;
+
+    left:54%;
+
+    transform:translate(-50%, 0);
+
+    z-index:2;
+
+}
+
+#player img{
+
+    width:150px;
+
+    animation: floaty 3.6s ease-in-out infinite;
+
+}
+
+#voice-status{
+
+    position:absolute;
+
+    bottom:20px;
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+    padding:14px 18px;
+
+    border-radius:32px;
+
+    background:rgba(5, 16, 44, 0.72);
+
+    border:1px solid rgba(255,255,255,0.12);
+
+    box-shadow:0 16px 60px rgba(5, 18, 46, 0.32);
+
+    font-size:16px;
+
+    z-index:2;
+
+    width:auto;
+    max-width:min(90%, 380px);
+    text-align:center;
+    display:inline-flex;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+}
+
+.status-icon{
+    width:22px;
+    height:22px;
+    object-fit:contain;
+}
+
+.status-message{
+    font-size:0.95rem;
+    color:#f5f9ff;
+    line-height:1.25;
+    white-space:normal;
+    max-width: calc(100% - 32px);
+}
+
+
+
+#enemy-container{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    max-width:100%;
+    max-height:100%;
+    overflow:hidden;
+    pointer-events:none;
+}
+
+.enemy{
+
+    position:absolute;
+
+    width:clamp(72px, 11vw, 120px);
+
+    height:clamp(72px, 11vw, 120px);
+
+    transform:translate(-50%,-50%);
+
+    z-index:1;
+
+    animation: floaty 4s ease-in-out infinite;
+
+}
+
+.enemy-image{
+
+    width:100%;
+    height:100%;
+    object-fit:contain;
+
+}
+
+.enemy-letter{
+
+    position:absolute;
+
+    left:50%;
+
+    top:50%;
+
+    transform:translate(-50%,-50%);
+
+    font-size:34px;
+
+    font-weight:bold;
+
+    color:white;
+
+    pointer-events:none;
+
+}
+
+.bullet{
+    position:absolute;
+    width:10px;
+    height:20px;
+    background:#fff;
+    border-radius:50%;
+    z-index:10;
+    opacity:1;
+    transition:transform 0.18s ease-out, opacity 0.18s ease-out;
+}
+
+
+.enemy-bullet{
+    position:absolute;
+    width:12px;
+    height:24px;
+    background:linear-gradient(180deg, #7fd3ff 0%, #1f9bff 100%);
+    border-radius:50% 50% 50% 50%;
+    box-shadow:0 0 14px rgba(50,160,255,0.85);
+    z-index:11;
+    opacity:1;
+    transition:transform 0.18s ease-out, opacity 0.18s ease-out;
+}
+
+.enemy-fired{
+    animation:enemyFireFlash 0.35s ease-out;
+}
+
+.ship-hit{
+    animation:shipHitShake 0.35s ease-in-out;
+}
+
+.enemy-exploded .enemy-image{
+    opacity:0.95;
+}
+
+@keyframes floaty{
+    0%,100%{ transform:translate(-50%,-50%) translateY(0); }
+    50%{ transform:translate(-50%,-50%) translateY(-10px); }
+}
+
+@keyframes enemyFireFlash{
+    0%{ box-shadow:0 0 0 rgba(0,0,0,0); filter:brightness(1); }
+    50%{ box-shadow:0 0 20px rgba(50,160,255,0.95); filter:brightness(1.08); }
+    100%{ box-shadow:0 0 0 rgba(0,0,0,0); filter:brightness(1); }
+}
+
+@keyframes shipHitShake{
+    0%{ transform:translateY(0) rotate(0deg); }
+    25%{ transform:translateY(-6px) rotate(-3deg); }
+    50%{ transform:translateY(2px) rotate(2deg); }
+    75%{ transform:translateY(-2px) rotate(-1deg); }
+    100%{ transform:translateY(0) rotate(0deg); }
+}
+
+.enemy-beam{
+    position:absolute;
+    pointer-events:none;
+    background:linear-gradient(90deg, rgba(127,211,255,0.95) 0%, rgba(31,155,255,1) 60%);
+    border-radius:4px;
+    box-shadow:0 0 18px rgba(50,160,255,0.9);
+    z-index:15;
+    transform-origin:left center;
+    opacity:0;
+}
+
+@media (max-width: 980px) {
+    .hud-panel {
+        padding: 12px 16px;
+        min-width: auto;
+    }
+    .level-panel {
+        top: 14px;
+        left: 16px;
+    }
+    .score-panel {
+        top: 14px;
+        right: 16px;
+    }
+    .lives-panel {
+        left: 16px;
+        bottom: 16px;
+    }
+    .hud-value {
+        font-size: 20px;
+    }
+    .hud-title {
+        font-size: 11px;
+    }
+    #voice-status {
+        min-width: 260px;
+        padding: 12px 18px;
+        font-size: 16px;
+    }
+    #player img {
+        width: 120px;
+    }
+}
+
+@media (max-width: 760px) {
+    #game-area {
+        padding-bottom: 100px;
+    }
+    #voice-status {
+        left: 50%;
+        width: min(90%, 340px);
+        bottom: 10px;
+        white-space: normal;
+    }
+    .enemy {
+        width: 70px;
+        height: 70px;
+    }
+    .enemy-letter {
+        font-size: 24px;
+    }
+    #player {
+        bottom: 50px;
+    }
+}
+
+@media (max-width: 520px) {
+    #voice-status {
+        min-width: 240px;
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+    .enemy {
+        width: 56px;
+        height: 56px;
+    }
+    #player img {
+        width: 96px;
+    }
+}
+
+@media (max-width: 420px) {
+    .hud-panel {
+        padding: 10px 14px;
+        min-width: auto;
+    }
+    .level-panel, .score-panel {
+        top: 12px;
+    }
+    .lives-panel {
+        bottom: 12px;
+    }
+    #voice-status {
+        width: min(90%, 280px);
+        padding: 10px 14px;
+        font-size: 13px;
+        bottom: 8px;
+    }
+    #player {
+        bottom: 40px;
+    }
+    .enemy-letter {
+        font-size: 20px;
+    }
+}
+

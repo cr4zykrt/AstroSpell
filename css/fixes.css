@@ -1,0 +1,54 @@
+/* Additions for the fixed version. Loaded last, so it only adds to the other stylesheets. */
+
+/* --- enemies scale with the length of the word (set from enemy.js) --- */
+.enemy{
+    width: var(--enemy-size, clamp(72px, 11vw, 120px));
+    height: var(--enemy-size, clamp(72px, 11vw, 120px));
+}
+.enemy-letter{
+    font-size: calc(var(--enemy-size, 100px) * 0.34);
+}
+
+/* --- "press any key" prompt on the loading screen --- */
+#loading-prompt{
+    position: absolute;
+    left: 50%;
+    bottom: 96px;
+    transform: translateX(-50%);
+    width: min(92vw, 900px);
+    text-align: center;
+    font-family: 'Orbitron', Arial, Helvetica, sans-serif;
+    font-size: clamp(16px, 2.4vw, 30px);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: #ffffff;
+    text-shadow: 0 0 12px rgba(126, 224, 255, 0.9), 0 0 28px rgba(31, 155, 255, 0.7);
+    animation: loadingPromptPulse 1.4s ease-in-out infinite;
+    z-index: 5;
+}
+
+@keyframes loadingPromptPulse{
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.45; }
+}
+
+/* --- server problem message on the loading screen --- */
+#loading-error{
+    position: absolute;
+    left: 50%;
+    bottom: 96px;
+    transform: translateX(-50%);
+    width: min(92vw, 900px);
+    text-align: center;
+    font-family: 'Orbitron', Arial, Helvetica, sans-serif;
+    font-size: clamp(14px, 2vw, 24px);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #ffb4b4;
+    text-shadow: 0 0 10px rgba(255, 80, 80, 0.8);
+    z-index: 5;
+}
+
+@media (prefers-reduced-motion: reduce){
+    #loading-prompt{ animation: none; }
+}

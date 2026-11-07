@@ -1,0 +1,410 @@
+#loading-screen{
+    position: relative;
+    overflow: hidden;
+    width: 100vw;
+    min-height: 100vh;
+    height: 100vh;
+    background: #040814;
+    font-family: 'Orbitron', Arial, Helvetica, sans-serif;
+}
+
+#loading-video {
+    position: absolute;
+    inset: 0;
+    min-width: 100%;
+    min-height: 100%;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    z-index: 0;
+    pointer-events: none;
+}
+
+#loading-screen > * {
+    position: relative;
+    z-index: 1;
+}
+
+
+#loading-subtitle{
+    display: none;
+}
+
+#loading-bar{
+    width: calc(100% - 140px);
+    max-width: 1550px;
+    height: 24px;
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: url("../assets/backgrounds/loadingbar.png") center/100% 100% no-repeat;
+    background-size: 100% 100%;
+    border: 1px solid rgba(140,220,255,0.18);
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.3);
+}
+
+#loading-spaceship{
+    position:absolute;
+    top:70%;
+    left:15%;
+    transform: translate(-50%, -50%) rotate(90deg);
+    width:clamp(140px, 16vw, 220px);
+    height:clamp(84px, 10vw, 132px);
+    background:url("../assets/player/spaceship.png") center/contain no-repeat;
+    z-index:2;
+    pointer-events:none;
+    animation: loadingSpaceshipFly 10s ease-in-out infinite;
+}
+
+@keyframes loadingSpaceshipFly {
+    0% {
+        top:18%;
+        left:12%;
+        transform: translate(-50%, -50%) rotate(82deg);
+    }
+    25% {
+        top:16%;
+        left:82%;
+        transform: translate(-50%, -50%) rotate(94deg);
+    }
+    50% {
+        top:55%;
+        left:72%;
+        transform: translate(-50%, -50%) rotate(90deg);
+    }
+    75% {
+        top:75%;
+        left:28%;
+        transform: translate(-50%, -50%) rotate(86deg);
+    }
+    100% {
+        top:24%;
+        left:42%;
+        transform: translate(-50%, -50%) rotate(92deg);
+    }
+}
+
+#loading-bar-glow{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 28px;
+    background: radial-gradient(ellipse at center, rgba(62, 166, 255, 0.2) 0%, transparent 70%);
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    animation: bloom-pulse 2s ease-in-out infinite;
+}
+
+#loading-fill{
+    width: 0%;
+    height: 100%;
+    background: url("../assets/backgrounds/loadingbar.png") left center/100% 100% no-repeat;
+    background-size: 100% 100%;
+    border-radius: 28px 0 0 28px;
+    box-shadow: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.electric-glow{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: electric-flow 1.5s linear infinite;
+    pointer-events: none;
+}
+
+.electric-pulse{
+    position: absolute;
+    right: -2px;
+    top: 0;
+    width: 8px;
+    height: 100%;
+    background: radial-gradient(ellipse at center, #ffffff, rgba(255,255,255,0.3), transparent);
+    border-radius: 50%;
+    box-shadow: 0 0 12px #7ee0ff, 0 0 24px #3ea6ff;
+    animation: leading-edge-pulse 0.8s ease-in-out infinite;
+    filter: drop-shadow(0 0 6px rgba(126, 224, 255, 0.8));
+}
+
+.current-wave{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        90deg,
+        transparent 0px,
+        rgba(126, 224, 255, 0.4) 20px,
+        transparent 40px
+    );
+    animation: wave-motion 2s linear infinite;
+    pointer-events: none;
+}
+
+.lightning-container{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+.lightning-group{
+    opacity: 0;
+}
+
+.particles-container{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+.particle{
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: radial-gradient(circle, #7ee0ff, transparent);
+    border-radius: 50%;
+    box-shadow: 0 0 4px #3ea6ff;
+    pointer-events: none;
+}
+
+#loading-percent{
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #eff8ff;
+    font-size: 20px;
+    letter-spacing: 2px;
+    text-shadow: 0 8px 22px rgba(0,0,0,0.28);
+    z-index: 2;
+}
+
+/* ===== Animations ===== */
+
+@keyframes electric-flow {
+    0% {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+@keyframes wave-motion {
+    0% {
+        transform: translateX(-40px);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+@keyframes leading-edge-pulse {
+    0% {
+        box-shadow: 0 0 8px #7ee0ff, 0 0 16px #3ea6ff;
+        opacity: 1;
+    }
+    50% {
+        box-shadow: 0 0 16px #7ee0ff, 0 0 32px #3ea6ff;
+        opacity: 0.8;
+    }
+    100% {
+        box-shadow: 0 0 8px #7ee0ff, 0 0 16px #3ea6ff;
+        opacity: 1;
+    }
+}
+
+@keyframes bloom-pulse {
+    0%, 100% {
+        box-shadow: inset 0 0 8px rgba(62, 166, 255, 0.1);
+        opacity: 0.3;
+    }
+    50% {
+        box-shadow: inset 0 0 20px rgba(62, 166, 255, 0.3);
+        opacity: 0.6;
+    }
+}
+
+/* ===== Loading exhaust styles ===== */
+#loading-exhaust{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    z-index:1; /* behind the ship (ship is z-index:2) */
+    overflow:visible;
+}
+
+.exhaust-particle{
+    position:absolute;
+    border-radius:50%;
+    background: radial-gradient(circle at 30% 30%, #ffffff 0%, #e6fbff 12%, #9fe6ff 35%, rgba(126,224,255,0.45) 55%, rgba(0,0,0,0) 100%);
+    box-shadow: 0 0 14px rgba(126,224,255,0.85), 0 0 30px rgba(62,166,255,0.25);
+    mix-blend-mode: screen;
+    will-change: transform, opacity, left, top;
+}
+
+.exhaust-particle::after{
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(126,224,255,0.3) 40%, transparent 100%);
+    filter: blur(6px);
+    opacity: 0.75;
+    pointer-events: none;
+}
+
+/* small drifting dust */
+.exhaust-dust{
+    position:absolute;
+    width:4px;
+    height:4px;
+    border-radius:50%;
+    background: linear-gradient(180deg, #bfefff, rgba(126,224,255,0.6));
+    filter: blur(2px);
+    opacity:0.85;
+    box-shadow:0 0 6px rgba(126,224,255,0.7);
+}
+
+/* long streak used to create comet-like tail */
+.exhaust-streak{
+    position:absolute;
+    width:8px;
+    height:300px;
+    border-radius:6px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(196,245,255,0.85) 10%, rgba(150,220,255,0.6) 30%, rgba(80,200,255,0.25) 60%, rgba(0,0,0,0) 100%);
+    box-shadow: 0 0 36px rgba(62,166,255,0.9), 0 0 80px rgba(126,224,255,0.6);
+    mix-blend-mode: screen;
+    transform-origin: 50% 0%;
+    will-change: transform, opacity, left, top;
+    pointer-events:none;
+}
+
+/* Layered streak variants for cinematic tail */
+.exhaust-streak-core{
+    background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(196,245,255,0.95) 6%, rgba(150,220,255,0.75) 20%, rgba(80,200,255,0.4) 50%, rgba(0,0,0,0) 100%);
+    box-shadow: 0 0 48px rgba(80,200,255,0.95), 0 0 120px rgba(126,224,255,0.55);
+    opacity: 0.98;
+}
+
+.exhaust-streak-feather{
+    background: linear-gradient(180deg, rgba(200,245,255,0.9) 0%, rgba(120,220,255,0.6) 25%, rgba(40,190,255,0.18) 60%, rgba(0,0,0,0) 100%);
+    box-shadow: 0 0 28px rgba(80,200,255,0.6);
+    opacity: 0.85;
+    filter: blur(2px);
+}
+
+.exhaust-streak-vapor{
+    background: linear-gradient(180deg, rgba(180,230,255,0.7) 0%, rgba(140,210,255,0.35) 30%, rgba(80,190,255,0.12) 65%, rgba(0,0,0,0) 100%);
+    box-shadow: 0 0 18px rgba(80,200,255,0.35);
+    opacity: 0.7;
+    filter: blur(4px);
+}
+
+/* tiny wispy particles that swirl and detach */
+.exhaust-wisp{
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #eaffff 0%, rgba(180,240,255,0.6) 30%, rgba(0,0,0,0) 100%);
+    box-shadow: 0 0 8px rgba(150,220,255,0.9);
+    mix-blend-mode: screen;
+    filter: blur(1.2px);
+    pointer-events: none;
+}
+
+/* subtle pulse tied to engine thrust */
+@keyframes exhaust-pulse {
+    0% { transform: scaleY(1) translateZ(0); opacity: 1; filter: blur(0px); }
+    50% { transform: scaleY(1.02) translateZ(0); opacity: 0.95; filter: blur(1px); }
+    100% { transform: scaleY(1) translateZ(0); opacity: 1; filter: blur(0px); }
+}
+
+.exhaust-pulse {
+    animation: exhaust-pulse 1.2s ease-in-out infinite;
+}
+
+/* helper for soft motion blur look via transform blur */
+.streak-motion-blur{
+    filter: blur(2px);
+}
+
+/* fade helper for seamless removal */
+.exhaust-fade-out{
+    transition: opacity 1200ms linear, transform 1200ms linear;
+    opacity: 0 !important;
+}
+
+@keyframes particle-float {
+    0% {
+        opacity: 1;
+        transform: translateY(0px);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes lightning-strike {
+    0%, 10%, 15%, 100% {
+        opacity: 0;
+    }
+    12%, 13% {
+        opacity: 1;
+    }
+}
+
+/* ===== Responsive Design ===== */
+
+@media (max-width: 980px) {
+    #loading-title {
+        top: 8%;
+        font-size: clamp(24px, 6vw, 34px);
+        padding: 14px 24px;
+    }
+    #loading-bar {
+        width: calc(100% - 60px);
+        max-width: 1150px;
+        bottom: 24px;
+        height: 20px;
+    }
+    #loading-percent {
+        bottom: 58px;
+        font-size: clamp(24px, 6vw, 32px);
+    }
+}
+
+@media (max-width: 680px) {
+    #loading-bar {
+        width: calc(100% - 40px);
+        height: 18px;
+    }
+    #loading-percent {
+        font-size: 22px;
+        bottom: 48px;
+    }
+    #loading-title {
+        top: 10%;
+        font-size: 22px;
+        padding: 12px 20px;
+    }
+}

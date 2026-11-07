@@ -1,0 +1,65 @@
+*{
+
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+
+}
+
+@font-face {
+    font-family: 'Orbitron';
+    src: url('../assets/fonts/Orbitron-VariableFont_wght.ttf') format('truetype');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+body{
+
+    font-family: 'Orbitron', Arial, Helvetica, sans-serif;
+
+    background:#040814;
+
+    overflow:auto;
+
+    color:white;
+
+}
+
+#game{
+
+    width:100vw;
+
+    min-height:100vh;
+
+    position:relative;
+
+}
+
+.screen{
+
+    width:100%;
+
+    min-height:100vh;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+}
+
+.hidden{
+
+    display:none;
+
+}
+
+button{
+
+    cursor:pointer;
+
+}

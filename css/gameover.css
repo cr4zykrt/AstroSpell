@@ -1,0 +1,71 @@
+#gameover-screen{
+    background: url('../assets/backgrounds/bg.jpeg') center center / cover no-repeat;
+    min-height: 100vh;
+    font-family: 'Orbitron', Arial, Helvetica, sans-serif;
+}
+
+#gameover-title {
+    position:absolute;
+    top:80px;
+    left:50%;
+    transform:translateX(-50%);
+    font-size:30px;
+    color:#d9f3ff;
+    letter-spacing:8px;
+    text-transform:uppercase;
+    padding:18px 50px;
+    border-radius:35px;
+    background:rgba(8, 20, 42, 0.52);
+    border:2px solid rgba(115, 200, 255, 0.18);
+    box-shadow:0 24px 80px rgba(4, 20, 55, 0.32), inset 0 1px 0 rgba(255,255,255,0.06);
+    z-index:2;
+    font-weight:800;
+    text-shadow:0 8px 30px rgba(24, 150, 255, 0.12);
+}
+
+#gameover-prompt {
+    margin-top: 80px;
+    font-size: 1.2rem;
+    letter-spacing: 0.08em;
+    opacity: 0.95;
+    animation: blink 0.9s infinite alternate;
+}
+
+@keyframes blink {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0.2;
+    }
+}
+
+@media (max-width: 980px) {
+    #gameover-screen {
+        padding: 26px 20px;
+    }
+    #gameover-title {
+        top: 10px;
+        padding: 14px 24px;
+        font-size: clamp(24px, 6vw, 32px);
+        width: min(90%, 520px);
+    }
+    #gameover-prompt {
+        margin-top: 24px;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 680px) {
+    #gameover-screen {
+        padding: 22px 16px;
+    }
+    #gameover-title {
+        width: min(90%, 340px);
+        top: 8px;
+    }
+    #gameover-prompt {
+        margin-top: 18px;
+        font-size: 0.95rem;
+    }
+}
