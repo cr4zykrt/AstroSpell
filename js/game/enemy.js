@@ -22,22 +22,62 @@ function spawnEnemies(word){
     container.innerHTML = "";
 
     const letters = word.split("");
+    const n = letters.length;
     const width = container.clientWidth || window.innerWidth;
-    const height = container.clientHeight;
+    const height = container.clientHeight || window.innerHeight;
+
+    // Phones (narrow) and short landscape screens: wrap the letters into a grid that
+    // reads left-to-right, top-to-bottom like text, in the free space between the top
+    // bar and the ship. Big screens keep a single row (zig-zag for very long words).
+    const compact = width < 700 || height < 520;
+
+    if(compact){
+        const landscape = height < 520;
+        const topReserve = landscape ? 64 : 92;        // room for the top bar
+        const bottomReserve = landscape ? 175 : 200;   // room for the ship + voice status
+        const sideMargin = 10;
+        const gap = 6;
+        const availW = width - sideMargin * 2;
+        const availH = Math.max(80, height - topReserve - bottomReserve);
+
+        // Try 1..n rows; keep fewer rows unless more rows make the letters clearly bigger.
+        let best = null;
+        for(let rows = 1; rows <= n; rows++){
+            const perRow = Math.ceil(n / rows);
+            if(Math.ceil(n / perRow) !== rows) continue;   // would leave an empty row
+            const size = Math.min(72, (availW - gap * (perRow - 1)) / perRow, (availH - gap * (rows - 1)) / rows);
+            if(!best || size > best.size * 1.15) best = { rows, perRow, size };
+        }
+
+        const size = Math.max(32, Math.floor(best.size));
+        container.style.setProperty('--enemy-size', size + 'px');
+
+        letters.forEach((letter, index) => {
+            const row = Math.floor(index / best.perRow);
+            const col = index % best.perRow;
+            const inRow = Math.min(best.perRow, n - row * best.perRow);
+            const rowWidth = inRow * size + (inRow - 1) * gap;
+            const x = (width - rowWidth) / 2 + col * (size + gap) + size / 2;
+            const y = topReserve + row * (size + gap) + size / 2;
+            createEnemy(letter, (x / width) * 100, (y / height) * 100);
+        });
+        return;
+    }
 
     const yLocal = Math.max(180, Math.floor(height * 0.22));
     const yPct = Math.min(45, Math.round((yLocal / height) * 100));
 
     // Long words: shrink the sprites to fit and zig-zag the letters over two rows
     // so a 16-letter word does not overlap itself. Left-to-right order is unchanged.
-    const slot = width / (letters.length + 1);
-    const stagger = letters.length > 8;
-    const size = Math.max(48, Math.min(120, stagger ? slot * 1.8 : slot * 0.95));
+    const slot = width / (n + 1);
+    const singleRowSize = slot * 0.95;
+    const stagger = singleRowSize < 56;   // only zig-zag when one row would make the letters too small
+    const size = Math.max(48, Math.min(120, stagger ? slot * 1.8 : singleRowSize));
     container.style.setProperty('--enemy-size', Math.round(size) + 'px');
 
     letters.forEach((letter, index) => {
-        const xPct = letters.length > 1 ? ((index + 1) / (letters.length + 1)) * 100 : 50;
-        const rowOffset = stagger ? (index % 2 === 0 ? -7 : 9) : 0;
+        const xPct = n > 1 ? ((index + 1) / (n + 1)) * 100 : 50;
+        const rowOffset = stagger ? (index % 2 === 0 ? 0 : 14) : 0;   // second row sits lower, never higher (top bar)
         createEnemy(letter, xPct, yPct + rowOffset);
     });
 
@@ -160,7 +200,7 @@ function enemyAttackShip(sourceElement){
 
     // force layout then animate
     requestAnimationFrame(() => {
-        beam.style.transition = 'transform 0.22s ease-out, opacity 0.22s ease-out';
+        beam.style.transition = 'transform 0.15s ease-out, opacity 0.15s ease-out';
         beam.style.opacity = '1';
         beam.style.transform = `rotate(${angle}deg) scaleX(1)`;
     });
@@ -174,11 +214,15 @@ function enemyAttackShip(sourceElement){
             setTimeout(()=> ship.classList.remove('ship-hit'), 360);
         }catch(e){}
         try{ playEnemyHitSound(); }catch(e){}
-    }, 260);
+    }, 170);
 }
 
 function playExplosionSound(){
     try{
+        if(window.audioManager && window.audioManager.playSfx){
+            window.audioManager.playSfx('explosion');
+            return;
+        }
         const audio = new Audio('assets/sounds/effects/explosion.m4a');
         audio.volume = 0.8;
         audio.play().catch(()=>{});
@@ -187,6 +231,10 @@ function playExplosionSound(){
 
 function playEnemyHitSound(){
     try{
+        if(window.audioManager && window.audioManager.playSfx){
+            window.audioManager.playSfx('enemyhit');
+            return;
+        }
         const audio = new Audio('assets/sounds/effects/enemyhit.mp3');
         audio.volume = 0.7;
         audio.play().catch(()=>{});

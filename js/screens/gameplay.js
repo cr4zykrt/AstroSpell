@@ -108,23 +108,127 @@ function parseTranscriptToLetter(transcript){
 
 window.parseTranscriptToLetter = parseTranscriptToLetter;
 
+// Every NATO word found in the phrase, in the order spoken ("papa alpha" -> P, A).
+function extractPhoneticWords(transcript){
+    if(!transcript || typeof transcript !== 'string') return [];
+    const words = transcript.trim().toLowerCase().replace(/'/g, '').replace(/[^a-z\s-]/g, ' ').split(/\s+/).filter(Boolean);
+    const found = [];
+    for(let i = 0; i < words.length; i++){
+        const w = words[i];
+        if(w === 'x' && words[i + 1] === 'ray'){ found.push({ letter: 'X', word: 'x-ray' }); i++; continue; }
+        if(PHONETIC_LETTERS[w]) found.push({ letter: PHONETIC_LETTERS[w], word: w });
+    }
+    return found;
+}
+
+window.extractPhoneticWords = extractPhoneticWords;
+// The NATO word for each letter, used to spot words that merely SOUND like the one we expect.
+const NATO_WORD_FOR = {
+    A:'alpha', B:'bravo', C:'charlie', D:'delta', E:'echo', F:'foxtrot', G:'golf', H:'hotel',
+    I:'india', J:'juliet', K:'kilo', L:'lima', M:'mike', N:'november', O:'oscar', P:'papa',
+    Q:'quebec', R:'romeo', S:'sierra', T:'tango', U:'uniform', V:'victor', W:'whiskey',
+    X:'xray', Y:'yankee', Z:'zulu'
+};
+
+// How many single-letter changes turn word a into word b ("golf" -> "gulf" = 1).
+function editDistance(a, b){
+    const row = [];
+    for(let j = 0; j <= b.length; j++) row[j] = j;
+    for(let i = 1; i <= a.length; i++){
+        let previous = row[0];
+        row[0] = i;
+        for(let j = 1; j <= b.length; j++){
+            const temp = row[j];
+            row[j] = Math.min(row[j] + 1, row[j - 1] + 1, previous + (a[i - 1] === b[j - 1] ? 0 : 1));
+            previous = temp;
+        }
+    }
+    return row[b.length];
+}
+
+// The recogniser often mishears the very word we are waiting for ("golf" -> "gulf" / "gold").
+// If a heard word is almost the NATO word of the expected letter, count it as that letter.
+function findSoundAlike(transcript){
+    if(!transcript || !gameState.word) return null;
+    const expected = gameState.word[gameState.currentLetterIndex];
+    const target = NATO_WORD_FOR[expected];
+    if(!target) return null;
+    const maxDistance = target.length >= 6 ? 2 : 1;
+    const tokens = transcript.toLowerCase().replace(/'/g, '').replace(/[^a-z\s]/g, ' ').split(/\s+/).filter((t) => t.length >= 3);
+    for(const token of tokens){
+        if(editDistance(token, target) <= maxDistance) return { letter: expected, word: token };
+    }
+    return null;
+}
+
+window.findSoundAlike = findSoundAlike;
+// Which spoken phrase we are listening to, and how many of its words were already used.
+let currentUtterance = { id: null, consumed: 0 };
+
+function actOnSpokenLetter(item){
+    const expectedLetter = gameState.word[gameState.currentLetterIndex];
+    if(window.logSpokenWord){
+        window.logSpokenWord(gameState.word, item.word, item.letter === expectedLetter, expectedLetter);
+    }
+    const statusMessage = document.querySelector('.status-message');
+    if(statusMessage) statusMessage.textContent = `Spoken: ${item.word}`;
+
+    // Each spoken word is its own answer, so saying the same letter twice in a row
+    // (the O O in MOON) counts twice.
+    try{
+        destroyEnemy(item.letter, false);
+    }catch(e){
+        console.warn('Failed to process speech transcript', e);
+    }
+}
+
 function handleGameplaySpeechTranscript(event){
     const detail = (event && event.detail) || {};
     const transcript = detail.text || '';
     const interim = !!detail.interim;
+    const id = detail.id || null;
 
-    const statusMessage = document.querySelector('.status-message');
+    // A new spoken phrase starts a new count (events without an id are always separate phrases).
+    if(!id || currentUtterance.id !== id){
+        currentUtterance = { id, consumed: 0 };
+    }
 
-    // Interim results only update the on-screen hint; they never act as an answer.
+    // FAST PATH: a complete phonetic word is unmistakable, so act the moment it appears in the
+    // live transcript instead of waiting for the recogniser to finish the whole phrase.
+    // This is what makes the shot (or the enemy's counter-attack) feel instant.
+    const heard = extractPhoneticWords(transcript);
+    if(heard.length > currentUtterance.consumed){
+        const fresh = heard.slice(currentUtterance.consumed);
+        currentUtterance.consumed = heard.length;
+        for(const item of fresh){
+            if(gameState.lives <= 0 || gameState.currentLetterIndex >= gameState.word.length) break;
+            actOnSpokenLetter(item);
+        }
+        return;
+    }
+        // SOUNDS-LIKE: accept a word that is almost the one we are waiting for ("gulf" for "golf").
+    // Words that are exactly another letter's NATO word were already handled above.
+    if(heard.length === 0 && currentUtterance.consumed === 0 &&
+       gameState.lives > 0 && gameState.currentLetterIndex < gameState.word.length){
+        const near = findSoundAlike(transcript);
+        if(near){
+            currentUtterance.consumed = 1;
+            actOnSpokenLetter(near);
+            return;
+        }
+    }
+
+    // Nothing usable yet: interim results only update the on-screen hint.
     if(interim){
+        const statusMessage = document.querySelector('.status-message');
         const firstWord = (transcript || '').split(/\s+/).filter(Boolean)[0] || transcript;
-        const parsedInterim = parseTranscriptToLetter(firstWord);
-        const hint = `Hearing: ${(parsedInterim && parsedInterim.word) || firstWord}`;
+        const hint = `Hearing: ${firstWord}`;
         if(statusMessage) statusMessage.textContent = hint;
         setVoiceStatus('listening', hint);
         return;
     }
 
+    // ---- final result ----
     // Try what the recogniser thought it heard first, then its alternatives.
     const candidates = [transcript].concat(detail.alternatives || [])
         .filter((text, index, all) => text && all.indexOf(text) === index);
@@ -141,6 +245,10 @@ function handleGameplaySpeechTranscript(event){
         return;
     }
 
+    // Phonetic words in this phrase were already used by the fast path.
+    if(currentUtterance.consumed > 0) return;
+
+    // Otherwise accept plain letter names too ("bee", "see") and the recogniser's alternatives.
     let parsed = null;
     for(const candidate of candidates){
         parsed = parseTranscriptToLetter(candidate);
@@ -152,20 +260,9 @@ function handleGameplaySpeechTranscript(event){
         return;
     }
 
-    const expectedLetter = gameState.word[gameState.currentLetterIndex];
-    if(window.logSpokenWord){
-        window.logSpokenWord(gameState.word, parsed.word, parsed.letter === expectedLetter, expectedLetter);
-    }
-
-    if(statusMessage) statusMessage.textContent = `Spoken: ${parsed.word}`;
-
-    // A final transcript is delivered once per spoken utterance, so saying the same
-    // letter twice in a row (the O O in MOON) is two real answers.
-    try{
-        destroyEnemy(parsed.letter, false);
-    }catch(e){
-        console.warn('Failed to process speech transcript', e);
-    }
+    if(gameState.lives <= 0 || gameState.currentLetterIndex >= gameState.word.length) return;
+    currentUtterance.consumed = 1;
+    actOnSpokenLetter(parsed);
 }
 
 function createGameplay(word, levelName = 'LEVEL 1'){

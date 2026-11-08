@@ -30,9 +30,9 @@ function createMenu(){
 
         <div id="menu-spaceship" aria-hidden="true"></div>
 
-        <p id="press-space">
+        <p id="press-space" role="button" tabindex="0">
 
-            SAY START TO ENTER THE GAME
+            SAY START TO ENTER THE GAME<span class="tap-hint"><br>OR TAP HERE</span>
         </p>
 
     </section>
@@ -109,11 +109,36 @@ function stopMenuVoice(){
     currentMenuNarration = null;
 }
 
+let menuStarting = false;
+
+// Starts the game. Used by the spoken command "start" and by tapping / pressing Enter
+// on the prompt (handy when the microphone is not available, e.g. on an insecure page).
+async function startGameFromMenu(source){
+    if (menuStarting) return;
+    menuStarting = true;
+
+    if (window.logActivity){
+        window.logActivity('menu_command', { command: 'start', source });
+    }
+
+    if (menuSpeechTranscriptHandler){
+        document.removeEventListener('speechTranscript', menuSpeechTranscriptHandler);
+        menuSpeechTranscriptHandler = null;
+    }
+    stopMenuVoice();
+    if (window.levelManager && window.levelManager.whenReady){
+        await window.levelManager.whenReady();
+    }
+    menuStarting = false;
+    loadGameplay();
+}
+
 async function handleMenuSpeechTranscript(event){
     if (!event || !event.detail) return;
     const transcript = event.detail.text || '';
     const interim = !!event.detail.interim;
-    if (interim) return;
+    // Only "start" is acted on while still hearing; the other commands wait for the final result.
+    if (interim && getMenuCommand(transcript) !== 'start') return;
 
     const isStop = getStopCommand(transcript);
     const command = getMenuCommand(transcript);
@@ -135,19 +160,7 @@ async function handleMenuSpeechTranscript(event){
     if (!command) return;
 
     if (command === 'start'){
-        if (window.logActivity){
-            window.logActivity('menu_command', { command: 'start' });
-        }
-
-        if (menuSpeechTranscriptHandler){
-            document.removeEventListener('speechTranscript', menuSpeechTranscriptHandler);
-            menuSpeechTranscriptHandler = null;
-        }
-        stopMenuVoice();
-        if (window.levelManager && window.levelManager.whenReady){
-            await window.levelManager.whenReady();
-        }
-        loadGameplay();
+        startGameFromMenu('voice');
         return;
     }
 
@@ -182,17 +195,28 @@ function startMenuVoiceListener(){
 
 function loadMenu(){
 
+    menuStarting = false;
     changeScreen(createMenu());
     if (window.logActivity){
         window.logActivity('menu_screen_viewed', { screen: 'menu' });
     }
 
+    const startPrompt = document.getElementById('press-space');
+    if (startPrompt){
+        startPrompt.addEventListener('click', () => startGameFromMenu('tap'));
+        startPrompt.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' '){
+                e.preventDefault();
+                startGameFromMenu('keyboard');
+            }
+        });
+    }
+
     if (window.initializeSpeechRecognition && window.startListening){
         initializeSpeechRecognition();
         startMenuVoiceListener();
-        speakMenuPrompt().then(() => {
-            if (window.startListening) startListening();
-        });
+        startListening();      // listen right away; the game ignores its own voice while it speaks
+        speakMenuPrompt();
     } else if (window.speakText){
         speakText(MENU_VOICE_PROMPT);
     }

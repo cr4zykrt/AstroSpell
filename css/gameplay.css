@@ -161,9 +161,9 @@
 
     position:absolute;
 
-    bottom:60px;
+    bottom:140px;
 
-    left:54%;
+    left:50%;
 
     transform:translate(-50%, 0);
 
@@ -175,7 +175,7 @@
 
     width:150px;
 
-    animation: floaty 3.6s ease-in-out infinite;
+    animation: shipFloat 3.6s ease-in-out infinite;
 
 }
 
@@ -319,7 +319,10 @@
 .enemy-exploded .enemy-image{
     opacity:0.95;
 }
-
+@keyframes shipFloat{
+    0%,100%{ transform:translateY(0); }
+    50%{ transform:translateY(-10px); }
+}
 @keyframes floaty{
     0%,100%{ transform:translate(-50%,-50%) translateY(0); }
     50%{ transform:translate(-50%,-50%) translateY(-10px); }
